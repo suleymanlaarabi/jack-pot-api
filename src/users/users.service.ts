@@ -9,6 +9,7 @@ import { compareSync, hashSync } from 'bcrypt';
 export type UserPayload = {
   id: number;
   username: string;
+  money: number;
 };
 
 @Injectable()
@@ -43,7 +44,9 @@ export class UsersService {
 
     if (existingUser) {
       throw new HttpException(
-        UsersError.USER_ALREADY_EXIST,
+        {
+          message: [UsersError.USER_ALREADY_EXIST],
+        },
         HttpStatus.CONFLICT,
       );
     }
@@ -61,6 +64,7 @@ export class UsersService {
     return this.authenticateUser({
       id: newUser.id,
       username: newUser.username,
+      money: newUser.money,
     });
   }
 
@@ -75,12 +79,19 @@ export class UsersService {
     });
 
     if (!existingUser) {
-      throw new HttpException(UsersError.USER_NOT_EXIST, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        {
+          message: [UsersError.USER_NOT_EXIST],
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     if (!compareSync(loginUserData.password, existingUser.password)) {
       throw new HttpException(
-        UsersError.PASSWORD_NOT_MATCH,
+        {
+          message: [UsersError.PASSWORD_NOT_MATCH],
+        },
         HttpStatus.CONFLICT,
       );
     }
@@ -88,7 +99,32 @@ export class UsersService {
     return this.authenticateUser({
       id: existingUser.id,
       username: existingUser.username,
+      money: existingUser.money,
     });
+  }
+
+  async getUserProfile(user: UserPayload) {
+    const { id } = user;
+
+    const existingUser = await this.prismaService.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        username: true,
+        money: true,
+      },
+    });
+
+    if (!existingUser) {
+      throw new HttpException(
+        {
+          message: [UsersError.USER_NOT_EXIST],
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return existingUser;
   }
 
   async authenticateUser(payload: UserPayload) {
