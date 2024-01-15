@@ -11,6 +11,7 @@ export class SlotMachineService {
   async playMachine(user: UserPayload, data: PlayMachineDto) {
     const { id } = user;
     const { amount } = data;
+    console.log(amount);
 
     let newMoney = (
       await this.prismaService.user.findUnique({
@@ -60,7 +61,10 @@ export class SlotMachineService {
       },
     });
 
-    return newMoney;
+    return {
+      roll,
+      newMoney,
+    };
   }
 
   getNumberBetween1To7() {
