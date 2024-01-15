@@ -14,7 +14,9 @@ import { JwtAuthGuard } from './strategy/jwt-auth.guard';
 export interface RequestWithUserPayload extends Request {
   user: UserPayload;
 }
-
+export interface UserResponse {
+  access_token: string;
+}
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -30,8 +32,8 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('auth')
+  @Get('')
   async authenticate(@Request() request: RequestWithUserPayload) {
-    return request.user;
+    return await this.usersService.getUserProfile(request.user);
   }
 }
