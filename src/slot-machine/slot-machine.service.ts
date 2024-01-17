@@ -45,12 +45,17 @@ export class SlotMachineService {
     let multiplier = 0;
 
     if (roll[0] === roll[1] && roll[1] === roll[2]) {
+      console.log('3');
       multiplier = 2;
-    }
-
-    if (roll[0] === roll[1] || roll[1] === roll[2] || roll[0] === roll[2]) {
+    } else if (
+      roll[0] === roll[1] ||
+      roll[1] === roll[2] ||
+      roll[0] === roll[2]
+    ) {
       multiplier = 1;
     }
+
+    console.log(amount, multiplier);
 
     newMoney = newMoney + amount * multiplier;
 
